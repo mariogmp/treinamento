@@ -1,0 +1,72 @@
+<html>
+<head>
+    <title>Meus Pacientes</title>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>Meus Pacientes</h1>
+        </div>
+    </header>
+    <main class="container">
+        <section>
+        <h2>Meus Pacientes</h2>
+        <table>
+            <tr>
+                <th>Nome</th>
+                <th>Peso(kg)</th>
+                <th>Altura</th>
+                <th>IMC</th>                
+            </tr>
+            <tr class="paciente">
+                <td class="info-nome">Leonardo</td>
+                <td class="info-peso">57</td>
+                <td class="info-altura">1.67</td>
+                <td class="info-imc"></td>
+            </tr>
+            <tr class="paciente">
+                <td class="info-nome">Paulo</td>
+                <td class="info-peso">100</td>
+                <td class="info-altura">2.00</td>
+                <td class="info-imc"></td>
+            </tr>    
+        </table>
+        <!-- Não é boa prática misturar código javascript dentro do html -->
+        <!--<button id="calcula-imcs" class="botao" onclick="calculaTodosImcs()">Calcular IMC</button>-->
+
+        <!-- Melhor forma é adicionar eventos no clique do botão dentro dos arquivos js-->
+        <button id="calcula-imcs" class="botao">Calcular IMC</button>
+
+        </section>
+        <section>
+            <h2>Adicionar novo paciente</h2>
+            <form>
+                <fieldset>
+                    <label for="nome">Nome:</label>
+                    <input id="campo-nome" type="text" placeholder="Digite o nome do paciente">
+                </fieldset>                
+                <fieldset class="campo-medio"> 
+                        <label for="peso">Peso:</label>
+                        <input id="campo-peso" type="text" placeholder="Digite o peso do paciente">
+                </fieldset>                                
+                <fieldset class="campo-medio"> 
+                        <label for="altura">Altura:</label>
+                        <input id="campo-altura" type="text" placeholder="Digite a altura do paciente">
+                </fieldset>        
+                <button id="adicionar-paciente" class="botao bto-principal">Adicionar</button>                    
+            </form>
+        </section>
+
+        <!-- A ordem de importação dos arquivos javascripts importa! -->
+        <script src="monta-paciente.js"></script>
+        <script src="percorre.js"></script>
+        <script src="calcula-imc.js"></script>
+        <script src="imprime-nome.js"></script>        
+        <script src="muda-de-cor.js"></script>
+        <script src="adiciona.js"></script>
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Negociações</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.css">
+    
+</head>
+<body class="container">
+    
+    <h1 class="text-center">Negociações</h1>
+    
+    <form class="form" onsubmit="negociacaoController.adiciona(event)">
+        
+        <div class="form-group">
+            <label for="data">Data</label>
+            <input type="date" id="data" class="form-control" required autofocus/>        
+        </div>    
+        
+        <div class="form-group">
+            <label for="quantidade">Quantidade</label>
+            <input type="number" min="1" step="1" id="quantidade" class="form-control" value="1" required/>
+        </div>
+        
+        <div class="form-group">
+            <label for="valor">Valor</label>
+            <input id="valor" type="number" class="form-control"  min="0.01" step="0.01" value="0.0" required />
+        </div>
+        
+        <button class="btn btn-primary" type="submit">Incluir</button>
+    </form>
+    
+    <div class="text-center">
+        <button class="btn btn-primary text-center" type="button">
+            Importar Negociações
+        </button>
+        <button class="btn btn-primary text-center" type="button">
+            Apagar
+        </button>
+    </div> 
+    <br>
+    <br>
+    
+    <table class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>DATA</th>
+                <th>QUANTIDADE</th>
+                <th>VALOR</th>
+                <th>VOLUME</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+        </tbody>
+        
+        <tfoot>
+        </tfoot>
+    </table>
+
+    
+    <!-- <script src="js/index.js"></script> -->
+    <script src="js/app/controllers/NegociacaoController.js"></script>
+    <script src="js/app/models/Negociacao.js"></script>
+
+    <script>
+
+        // Instanciando o objeto controller
+        let negociacaoController = new NegociacaoController();
+
+        /** Exemplos de manipulação de objetos em JS
+        
+        // Toda classe que possui o método 'constructor()' só poder ser chamada com a utilização de 'new'
+        var n1 = new Negociacao(new Date(), 10, 500);        
+        console.log(n1);
+
+        // Congela o objeto proceduralmente
+        // Object.freeze(n1);
+        // Retorna se o objeto está congelado
+        console.log(Object.isFrozen());
+
+        // Está acessando um atributo que deveria ser privado
+        // Como o objeto está congelado, esse atributo não será alterado
+        n1._quantidade = 10000;
+
+        // Caso o getData() não retorne um new, apesar do freeze, os atributos de Date continuam podendo ser acessados
+        // O freeze é "raso", não congela subníveis de objetos dentro do objeto (ver obs 02 em Negociacao.js)
+        console.log(n1.data);
+        n1.data.setDate(11);
+
+        // Mesmo com o getData() tratado, caso a data seja montada como na forma a seguir, esta continuará a ser alterada.
+        // Para evitar isso deve-se montar a data com "new" no construtor do objeto (ver obs 01 em Negociacao.js)
+        var hoje = new Date();
+        hoje.setDate(11);
+        var n1 = new Negociacao(hoje, 10, 500); 
+
+        // Melhor forma de acessar atributos do objeto
+        console.log(n1.data);
+        console.log(n1.quantidade);
+        console.log(n1.valor);
+        console.log(n1.volume);        
+
+        // Outra forma de acessar atributos do objeto
+        // console.log(n1.getData());
+        // console.log(n1.getQuantidade());
+        // console.log(n1.getValor());
+        // console.log(n1.getVolume());
+        
+        // As variáveis motandas com "var" possuem escopo global, mesmo que declaradas dentro de um bloco (ex: dentro de um for)
+        // var n2 = new Negociacao(new Date(), 5, 200);
+
+        // As variáveis montadas com "let" possuem escopo de bloco. É boa prática utilizar o "let"
+        let n2 = new Negociacao(new Date(), 5, 200);
+        console.log(n2);
+
+        */
+
+    </script>
+    
+</body>
+</html>
