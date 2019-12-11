@@ -1,7 +1,7 @@
 class NegociacaoController{
 
     constructor(){
-        
+
         // Forma mais verbosa de se acessar os atributos do html
         // let inputData = document.querySelector("#data");
         // let inputQuantidade = document.querySelector("#quantidade");
@@ -18,9 +18,23 @@ class NegociacaoController{
         this._inputQuantidade = $("#quantidade");
         this._inputValor = $("#valor");
 
-        this._listaNegociacaoes = new ListaNegociacoes();
+        // Passando como parâmetro uma função com comportamento a ser executado quando ListaNegociacoes for construída
+        // Parâmetro "this" no caso é o NegociacaoController
+        // Preciso usar reflection dentro do ListaNegociacoes para trabahar com o contexto de NegociocaoController
+        /*
+        this._listaNegociacoes = new ListaNegociacoes(this, function(model){            
+            this._negociacoesView.update(model);
+        });
+        */
+
+        // Utilizando aerofunction o escopo do "this" é léxico e não dinâmico
+        // Não preciso usar reflection dentro do ListaNegociacoes
+        this._listaNegociacoes = new ListaNegociacoes(model =>            
+            this._negociacoesView.update(model)
+        );        
+
         this._negociacoesView = new NegociacoesView($("#negociacoesView"));
-        this._negociacoesView.update(this._listaNegociacaoes);
+        this._negociacoesView.update(this._listaNegociacoes);
 
         this._mensagem = new Mensagem();
         this._mensagemView = new MensagemView($("#mensagemView"));
@@ -32,17 +46,29 @@ class NegociacaoController{
         event.preventDefault();
 
         // Adicionar a negociação em uma lista
-        this._listaNegociacaoes.adiciona(this._criaNegociacao());
+        this._listaNegociacoes.adiciona(this._criaNegociacao());
         this._mensagem = new Mensagem("Negociação adicionada com sucesso.");        
-        this._mensagemView.update(this._mensagem);
+        
+        // Não necessita mais ser chamado pois o update está sendo chamado no construtor do ListaNegociacoes
+        // this._negociacoesView.update(this._listaNegociacoes);
         
         // Caso o get negociacoes não seja tratado, essa linha de código cria indevidamente uma negociação
-        // this._listaNegociacaoes.negociacoes.push(this._criaNegociacao());
+        // this._listaNegociacoes.negociacoes.push(this._criaNegociacao());
 
         this._limpaFormulario();
-
-        this._negociacoesView.update(this._listaNegociacaoes);
     }
+
+    apaga(){
+
+        this._listaNegociacoes.esvazia();
+        
+        // Não necessita mais ser chamado pois o update está sendo chamado no construtor do ListaNegociacoes
+        // this._negociacoesView.update(this._listaNegociacoes);
+
+        this._mensagem.texto = 'Negociações apagadas com sucesso';
+        this._mensagemView.update(this._mensagem);
+    }
+
 
     _criaNegociacao(){
 
@@ -59,6 +85,5 @@ class NegociacaoController{
         this._inputValor.value = 0.0;
         this._inputData.focus();
     }
-
 
 }
