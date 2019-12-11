@@ -2,6 +2,11 @@ class NegociacaoController{
 
     constructor(){
 
+        // Forma mais verbosa de se acessar os atributos do html
+        // let inputData = document.querySelector("#data");
+        // let inputQuantidade = document.querySelector("#quantidade");
+        // let inputValor = document.querySelector("#valor");
+
         // Coloca uma função dentro da variável "$" (Parecido com o jQuery)
         // Não funciona da forma abaixo pois o método "querySelector" só funciona dentro do objeto "document"
         // let $ = document.querySelector;        
@@ -12,63 +17,40 @@ class NegociacaoController{
         this._inputData = $("#data");
         this._inputQuantidade = $("#quantidade");
         this._inputValor = $("#valor");
+        this._listaNegociacaoes = new ListaNegociacoes();
     }
 
     adiciona(event){
 
-        event.preventDefault();        
-        // Forma mais verbosa de se acessar os atributos do html
-        // let inputData = document.querySelector("#data");
-        // let inputQuantidade = document.querySelector("#quantidade");
-        // let inputValor = document.querySelector("#valor");
-
-        // Exibindo valores dos formulários
-        //console.log(inputData.value)
-        //console.log(inputQuantidade.value)
-        //console.log(inputValor.value)
-
-        console.log(this._inputData.value);
-        console.log(this._inputQuantidade.value);
-        console.log(this._inputValor.value);
-
-        // Trabalhando com data
-
-        // A data chega do form como String
-        console.log(typeof(this._inputData.value));        
-
-        // Convertendo a data para objeto Date usando split
-        // let data = new Date(this._inputData.value.split('-'));      
-
-        // Convertendo a data para objeto Date Usando expressão regular  
-        // let data = new Date(this._inputData.value.replace(/-/g, ','));      
-
-        // Construindo a data utilizando o spread operator ("...") e utilizando map para incrementar o month da data
-
-        // Utilizando function
-        /**
-        let data = new Date(...
-            this._inputData.value.split('-').map(function(item, indice){
-                return item - indice % 2;
-                })
-            );
-        */
-
-        // Utilizando aerofunction
-        let data = new Date(...
-            //this._inputData.value.split('-').map((item, indice) =>{return item - indice % 2;})
-            // Como o aerofunction possui somente um retorno, as aspas podem ser retiradas
-            this._inputData.value.split('-').map((item, indice) => item - indice % 2)
-            );
-        
-        let negociacao = new Negociacao(
-            data, 
-            this._inputQuantidade.value, 
-            this._inputValor.value);
-
-        console.log(negociacao);
+        event.preventDefault();
 
         // Adicionar a negociação em uma lista
+        this._listaNegociacaoes.adiciona(this._criaNegociacao());
+        
+        // Caso o get negociacoes não seja tratado, essa linha de código cria indevidamente uma negociação
+        // this._listaNegociacaoes.negociacoes.push(this._criaNegociacao());
+
+        this._limpaFormulario();
+
+        console.log(this._listaNegociacaoes.negociacoes);
 
     }
+
+    _criaNegociacao(){
+
+        return new Negociacao(
+            DateHelper.textoParaData(this._inputData.value), 
+            this._inputQuantidade.value, 
+            this._inputValor.value); 
+    }
+
+    _limpaFormulario(){
+
+        this._inputData.value = '';
+        this._inputQuantidade.value = '1';
+        this._inputValor.value = 0.0;
+        this._inputData.focus();
+    }
+
 
 }
