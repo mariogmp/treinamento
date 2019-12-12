@@ -18,6 +18,8 @@ class NegociacaoController{
         this._inputQuantidade = $("#quantidade");
         this._inputValor = $("#valor");
 
+        /** Estratégias para atualizar a View após alterações na ListaNegociacoes */
+
         // Passando como parâmetro uma função com comportamento a ser executado quando ListaNegociacoes for construída
         // Parâmetro "this" no caso é o NegociacaoController
         // Preciso usar reflection dentro do ListaNegociacoes para trabahar com o contexto de NegociocaoController
@@ -29,9 +31,37 @@ class NegociacaoController{
 
         // Utilizando aerofunction o escopo do "this" é léxico e não dinâmico
         // Não preciso usar reflection dentro do ListaNegociacoes
+        /**
         this._listaNegociacoes = new ListaNegociacoes(model =>            
             this._negociacoesView.update(model)
-        );        
+        );  
+        */      
+
+        /** fim */
+        
+        // Estratégia utilizando padrão de projeto Proxy
+        // Não é boa prática utilizar "armadilhas" dentro do modelo (no caso, da ListaNegociacoes)
+        // Será criado um proxy para o ListaNegociacoes, onde poderemos disparar as "armadilhas" antes de chamar o objeto ListaNegociacoes
+        let self = this;
+        this._listaNegociacoes = new Proxy(new ListaNegociacoes(), {
+
+            // Será chamado cada vez que eu tentar ler qualquer propriedade de Negociacao
+            get: function(target, prop, receiver){
+
+                // target = ListaNegociacoes
+                // prop = adicina ou esvazia
+                // receiver = o proxy
+
+                if (['adiciona','esvazia'].includes(prop) && typeof(target[prop] == typeof(Function))){
+                    return function(){
+                        console.log(`interceptando ${prop}`);
+                        Reflect.apply(target[prop], target, arguments);
+                        self._negociacoesView.update(target);
+                    }
+                }                    
+                return Reflect.get(target, prop, receiver);
+            }
+        });
 
         this._negociacoesView = new NegociacoesView($("#negociacoesView"));
         this._negociacoesView.update(this._listaNegociacoes);

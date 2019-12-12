@@ -11,10 +11,16 @@ class ListaNegociacoes {
     */
 
     // Caso "armadilha" seja montado por aerofunction não necessito do contexto
+    /** 
     constructor(armadilha){
         this._negociacoes = [];
         this._armadilha = armadilha;
     }
+    */
+
+   constructor(){
+    this._negociacoes = [];
+   }
 
     adiciona(negociacao){
 
@@ -27,7 +33,7 @@ class ListaNegociacoes {
 
         // Consigo acessar o this somente se o "armadilha" for montado utilizando aerofunction
         // No aerofunction o contexto do this é léxico e não dinâmico
-        this._armadilha(this); 
+        // this._armadilha(this); 
     }
 
     esvazia(){
@@ -41,7 +47,7 @@ class ListaNegociacoes {
 
         // Consigo acessar o this somente se o "armadilha" for montado utilizando aerofunction
         // No aerofunction o contexto do this é léxico e não dinâmico
-        this._armadilha(this);
+        // this._armadilha(this);
     }
 
     get negociacoes(){
