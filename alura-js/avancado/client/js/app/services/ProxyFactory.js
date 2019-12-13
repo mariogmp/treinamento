@@ -2,7 +2,7 @@ class ProxyFactory{
 
     static create(objeto, props, acao){
 
-        console.log("criando proxy para propriedades "+props)
+        //console.log("criando proxy para propriedades "+props)
 
         return new Proxy(objeto, {
 
@@ -17,7 +17,6 @@ class ProxyFactory{
                 if (props.includes(prop) && ProxyFactory._ehFuncao(target[prop])){
                     return function(){
                         let retorno = Reflect.apply(target[prop], target, arguments);
-                        console.log(`interceptando get ${prop}`);                        
                         // Retornando possível retorno da ação que será executada
                         return acao(target);
                     }
@@ -30,8 +29,6 @@ class ProxyFactory{
                 
                 let retorno = Reflect.set(target, prop, value, receiver);
                 if (props.includes(prop)){
-                    console.log(`interceptando set ${prop}`);           
-                    console.log("texto da mensagem (1): "+objeto.texto);                    
                     acao(target);
                 }
                 return retorno;                
