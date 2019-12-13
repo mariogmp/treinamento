@@ -37,53 +37,52 @@ class NegociacaoController{
         );  
         */      
 
-        /** fim */
+        /** Utilizando proxy 
         
         // Estratégia utilizando padrão de projeto Proxy
         // Não é boa prática utilizar "armadilhas" dentro do modelo (no caso, da ListaNegociacoes)
         // Será criado um proxy para o ListaNegociacoes, onde poderemos disparar as "armadilhas" antes de chamar o objeto ListaNegociacoes
-        let self = this;
-        this._listaNegociacoes = new Proxy(new ListaNegociacoes(), {
-
-            // Será chamado cada vez que eu tentar ler qualquer propriedade de Negociacao
-            get: function(target, prop, receiver){
-
-                // target = ListaNegociacoes
-                // prop = adicina ou esvazia
-                // receiver = o proxy
-
-                if (['adiciona','esvazia'].includes(prop) && typeof(target[prop] == typeof(Function))){
-                    return function(){
-                        console.log(`interceptando ${prop}`);
-                        Reflect.apply(target[prop], target, arguments);
-                        self._negociacoesView.update(target);
-                    }
-                }                    
-                return Reflect.get(target, prop, receiver);
-            }
-        });
+                
+        this._listaNegociacoes = ProxyFactory.create(
+            new ListaNegociacoes(), ['adiciona', 'esvazia'], model => this._negociacoesView.update(model));
 
         this._negociacoesView = new NegociacoesView($("#negociacoesView"));
-        this._negociacoesView.update(this._listaNegociacoes);
+        // Preciso chamar pela primeira vez
+        // this._negociacoesView.update(this._listaNegociacoes);
 
-        this._mensagem = new Mensagem();
+        this._mensagem = ProxyFactory.create(
+            new Mensagem(), ['texto'], model => this._mensagemView.update(model));
+
         this._mensagemView = new MensagemView($("#mensagemView"));
-        this._mensagemView.update(this._mensagem);
+        // Preciso chamar pela primeira vez
+        // this._mensagemView.update(this._mensagem);
+
+        */
+
+        // Utilizando estratégia de Binding
+
+        this._negociacoesView = new NegociacoesView($('#negociacoesView'));
+        this._listaNegociacoes = new Bind(new ListaNegociacoes(), this._negociacoesView, ['adiciona', 'esvazia']);
+
+        this._mensagemView = new MensagemView($('#mensagemView'));
+        this._mensagem = new Bind(new Mensagem(), this._mensagemView, ['texto']);
     }
 
     adiciona(event){
 
         event.preventDefault();
 
-        // Adicionar a negociação em uma lista
-        this._listaNegociacoes.adiciona(this._criaNegociacao());
-        this._mensagem = new Mensagem("Negociação adicionada com sucesso.");        
+        let negociacao = this._criaNegociacao();
+        this._listaNegociacoes.adiciona(negociacao);
+        this._mensagem.texto = "Negociação adicionada com sucesso";
         
         // Não necessita mais ser chamado pois o update está sendo chamado no construtor do ListaNegociacoes
         // this._negociacoesView.update(this._listaNegociacoes);
         
         // Caso o get negociacoes não seja tratado, essa linha de código cria indevidamente uma negociação
         // this._listaNegociacoes.negociacoes.push(this._criaNegociacao());
+
+        // this._mensagemView.update(this._mensagem);
 
         this._limpaFormulario();
     }
@@ -96,7 +95,7 @@ class NegociacaoController{
         // this._negociacoesView.update(this._listaNegociacoes);
 
         this._mensagem.texto = 'Negociações apagadas com sucesso';
-        this._mensagemView.update(this._mensagem);
+        //this._mensagemView.update(this._mensagem);
     }
 
 
