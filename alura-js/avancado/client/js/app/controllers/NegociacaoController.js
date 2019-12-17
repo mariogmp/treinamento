@@ -62,15 +62,43 @@ class NegociacaoController{
         // Utilizando estratégia de Binding
         this._listaNegociacoes = new Bind(new ListaNegociacoes(), new NegociacoesView($('#negociacoesView')), 'adiciona', 'esvazia');
         this._mensagem = new Bind(new Mensagem(), new MensagemView($('#mensagemView')), 'texto');
+
+        /** Utilizando um único "then"
+        ConnectionFactory.getConnection()
+            .then(connection => {
+                new NegociacaoDao(connection)
+                ._listaTodos()
+                    .then(negociacoes => {
+                        negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+                })        
+            });
+        */
+
+        ConnectionFactory.getConnection()
+            .then (connection => new NegociacaoDao(connection))
+            .then (dao => dao.listaTodos())
+            .then (negociacoes => negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao)))
+            .catch(error => this._mensagem.texto = error);
     }
 
     adiciona(event){
 
         event.preventDefault();
 
-        let negociacao = this._criaNegociacao();
-        this._listaNegociacoes.adiciona(negociacao);
-        this._mensagem.texto = "Negociação adicionada com sucesso";
+        ConnectionFactory
+            .getConnection()
+            .then(connection => {
+                let negociacao = this._criaNegociacao();        
+                
+                new NegociacaoDao(connection)
+                    .adiciona(negociacao)
+                    .then(() => {
+                        this._listaNegociacoes.adiciona(negociacao);
+                        this._mensagem.texto = "Negociação adicionada com sucesso";
+                        this._limpaFormulario();
+                    })                    
+            })
+            .catch(error => this._mensagem.texto = error);
         
         // Não necessita mais ser chamado pois o update está sendo chamado no construtor do ListaNegociacoes
         // this._negociacoesView.update(this._listaNegociacoes);
@@ -80,27 +108,90 @@ class NegociacaoController{
 
         // this._mensagemView.update(this._mensagem);
 
-        this._limpaFormulario();
+        // this._limpaFormulario();
     }
 
     apaga(){
 
-        this._listaNegociacoes.esvazia();
-        
+        ConnectionFactory.getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(dao => dao.apagaTodos())
+            .then(mensagem => {
+                this._mensagem.texto = mensagem;
+                this._listaNegociacoes.esvazia();
+            })
+            .catch(error => this._mensagem.texto = error);
+
         // Não necessita mais ser chamado pois o update está sendo chamado no construtor do ListaNegociacoes
         // this._negociacoesView.update(this._listaNegociacoes);
 
-        this._mensagem.texto = 'Negociações apagadas com sucesso';
         //this._mensagemView.update(this._mensagem);
     }
 
+    importaNegociacoes(){    
+
+        let service = new NegociacaoService();
+
+        // Pyramid of Doom - Problema característico de requisições assíncronas Ajax
+        // As requisições foram aninhadas para serem chamadas uma após a outra (se fossem chamadas aleatoriamente os dados poderiam ficar fora de ordem)
+        /**
+        service.obterNegociacaoesDaSemana((erro, negociacoes) => {
+
+            if (erro){
+                this._mensagem.texto = erro;
+                return;
+            }
+            negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+
+            service.obterNegociacaoesDaSemanaAnterior((erro, negociacoes) => {
+
+                if (erro){
+                    this._mensagem.texto = erro;
+                    return;
+                }
+                negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+
+                service.obterNegociacaoesDaSemanaRetrasada((erro, negociacoes) => {
+
+                    if (erro){
+                        this._mensagem.texto = erro;
+                        return;
+                    }    
+                    negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+                    this._mensagem.texto = "Negociações importadas com sucesso."
+                });                                
+            });                    
+        });
+        */
+
+        // Utilizando o padrão de projeto Promise
+        // obterNegociacaoesDaSemana faz uma "promessa" de obter esses dados (Obs: O método não recebe mais o callback)
+        // Se essa promessa for cumprida, o código será executado
+
+        let promise = new NegociacaoService();
+
+        // Método all chama os métodos na ordem
+        Promise.all([service.obterNegociacaoesDaSemana(), 
+                    service.obterNegociacaoesDaSemanaAnterior(), 
+                    service.obterNegociacaoesDaSemanaRetrasada()]
+        ).then(negociacoes => {   
+            
+            // Transformando array com 3 arrays (um em cada posição) para um array só (array achatado) utilizando o reduce
+            negociacoes
+                .reduce ((arrayAchatado, array) => arrayAchatado.concat(array), [])
+                .forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+
+            this._mensagem.texto = "Negociações importadas com sucesso."
+        }).catch(erro => this._mensagem.texto = erro);
+
+    }        
 
     _criaNegociacao(){
 
         return new Negociacao(
             DateHelper.textoParaData(this._inputData.value), 
-            this._inputQuantidade.value, 
-            this._inputValor.value); 
+            parseInt(this._inputQuantidade.value), 
+            parseFloat(this._inputValor.value)); 
     }
 
     _limpaFormulario(){
