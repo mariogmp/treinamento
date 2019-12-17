@@ -79,10 +79,10 @@ class NegociacaoController{
     }
 
     _init(){
-        ConnectionFactory.getConnection()
-            .then (connection => new NegociacaoDao(connection))
-            .then (dao => dao.listaTodos())
-            .then (negociacoes => negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao)))
+        let service = new NegociacaoService();
+
+        service.lista()
+            .then(negociacoes => negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao)))
             .catch(error => this._mensagem.texto = error);
 
         setInterval(() => this.importaNegociacoes(), 60000);
@@ -116,15 +116,15 @@ class NegociacaoController{
 
     apaga(){
 
-        ConnectionFactory.getConnection()
-            .then(connection => new NegociacaoDao(connection))
-            .then(dao => dao.apagaTodos())
+        let service = new NegociacaoService();
+
+        service.apaga()
             .then(mensagem => {
                 this._mensagem.texto = mensagem;
-                this._listaNegociacoes.esvazia();
+                this._listaNegociacoes.esvazia();                
             })
             .catch(error => this._mensagem.texto = error);
-
+            
         // Não necessita mais ser chamado pois o update está sendo chamado no construtor do ListaNegociacoes
         // this._negociacoesView.update(this._listaNegociacoes);
 

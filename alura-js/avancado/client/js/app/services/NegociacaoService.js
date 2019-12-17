@@ -63,14 +63,37 @@ class NegociacaoService{
     
     cadastra(negociacao){
 
-        return new Promise((resolve, reject) => {
-
-            ConnectionFactory.getConnection()
+        return ConnectionFactory.getConnection()
                 .then(connection => new NegociacaoDao(connection))
                 .then(dao => dao.adiciona(negociacao))
-                .then(() => resolve('Negociação adicionada com sucesso'))
-                .catch(erro => reject('Não foi possível adicionar negociação'));
-        })
+                .then(() => 'Negociação adicionada com sucesso.')
+                .catch((error) => {
+                    console.log(error);
+                    throw new Error('Erro ao adicionar negociação.');
+                });        
+    }
+
+    lista() {
+
+        return ConnectionFactory.getConnection()
+                .then(connection => new NegociacaoDao(connection))
+                .then(dao => dao.listaTodos())
+                .catch((error) => {
+                    console.log(error);
+                    throw new Error('Erro ao listar negociações.');
+                });        
+    }
+
+    apaga() {
+
+        return ConnectionFactory.getConnection()
+                .then(connection => new NegociacaoDao(connection))
+                .then(dao => dao.apagaTodos())
+                .then(() => 'Negociações apagadas com sucesso.')
+                .catch((error) => {
+                    console.log(error);
+                    throw new Error('Erro ao listar negociações.');
+                });
     }
 
     /**

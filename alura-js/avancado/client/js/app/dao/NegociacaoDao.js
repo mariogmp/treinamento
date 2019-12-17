@@ -20,8 +20,7 @@ class NegociacaoDao{
             }
 
             request.onerror = e => {
-                console.log(e.target.error);
-                reject('Não foi possível adicionar a negociação');
+                reject(e.target.error);
             }
         })
     }
@@ -52,8 +51,7 @@ class NegociacaoDao{
             }
 
             cursor.onerror = e => {
-                console.log(e.target.error);
-                reject('Não foi possível listar as negociações.');
+                reject(e.target.error);
             }            
         })
     }
@@ -68,12 +66,11 @@ class NegociacaoDao{
                 .clear();
 
             request.onsuccess = e => {
-                resolve('Negociações apagadas com sucesso.');
+                resolve();
             }
 
             request.onerror = e => {
-                console.log(e.target.error);
-                reject('Não foi possível apagar as negociações.');
+                reject(e.target.error);
             }
             
         })
