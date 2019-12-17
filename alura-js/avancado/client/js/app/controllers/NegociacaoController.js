@@ -130,11 +130,10 @@ class NegociacaoController{
 
     importaNegociacoes(){    
 
-        let service = new NegociacaoService();
-
         // Pyramid of Doom - Problema característico de requisições assíncronas Ajax
         // As requisições foram aninhadas para serem chamadas uma após a outra (se fossem chamadas aleatoriamente os dados poderiam ficar fora de ordem)
         /**
+        let service = new NegociacaoService();
         service.obterNegociacaoesDaSemana((erro, negociacoes) => {
 
             if (erro){
@@ -164,26 +163,19 @@ class NegociacaoController{
         });
         */
 
-        // Utilizando o padrão de projeto Promise
-        // obterNegociacaoesDaSemana faz uma "promessa" de obter esses dados (Obs: O método não recebe mais o callback)
-        // Se essa promessa for cumprida, o código será executado
+        let service = new NegociacaoService();
 
-        let promise = new NegociacaoService();
+        service.obterNegociacoes()
+            .then(negociacoes => 
+                negociacoes.filter(negociacao => 
+                    this._listaNegociacoes.negociacoes.indexOf(negociacao) == -1)
+            )
 
-        // Método all chama os métodos na ordem
-        Promise.all([service.obterNegociacaoesDaSemana(), 
-                    service.obterNegociacaoesDaSemanaAnterior(), 
-                    service.obterNegociacaoesDaSemanaRetrasada()]
-        ).then(negociacoes => {   
-            
-            // Transformando array com 3 arrays (um em cada posição) para um array só (array achatado) utilizando o reduce
-            negociacoes
-                .reduce ((arrayAchatado, array) => arrayAchatado.concat(array), [])
-                .forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
-
-            this._mensagem.texto = "Negociações importadas com sucesso."
-        }).catch(erro => this._mensagem.texto = erro);
-
+            .then(negociacoes => negociacoes.forEach(negociacao => {
+                this._listaNegociacoes.adiciona(negociacao)
+                this._mensagem.texto = 'Negociações importadas com sucesso.'
+            }))
+            .catch(erro => this._mensagem.texto = erro);            
     }        
 
     _criaNegociacao(){
