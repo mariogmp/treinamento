@@ -1,4 +1,4 @@
-class HttpService{
+export class HttpService{
 
     // Utilizando Fetch API
     get(url){

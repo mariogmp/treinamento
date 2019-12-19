@@ -1,4 +1,4 @@
-class ListaNegociacoes {
+export class ListaNegociacoes {
 
     // "Armadilha" será a função para atualização da view
     // Caso a função passada no parâmetro "armadilha" seja montado utilizando function necessito do contexto

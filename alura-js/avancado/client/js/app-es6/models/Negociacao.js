@@ -1,4 +1,4 @@
-class Negociacao{
+export class Negociacao{
 
     // Toda classe que possui o método 'constructor()' só poder ser chamada com a utilização de 'new'
     constructor(data, quantidade, valor){

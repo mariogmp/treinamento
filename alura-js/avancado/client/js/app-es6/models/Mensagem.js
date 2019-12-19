@@ -1,4 +1,4 @@
-class Mensagem {
+export class Mensagem {
 
     // Atribui valor padrão para o parâmetro texto
     // Caso nada seja passado como parâmetro, '' será utilizado
