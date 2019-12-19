@@ -125,6 +125,7 @@ class NegociacaoController{
 
     apaga(){
 
+
         this._service.apaga()
             .then(mensagem => {
                 this._mensagem.texto = mensagem;
